@@ -1,0 +1,42 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Вход</title>
+
+    <style>
+        #errorText {
+            color: red;
+        }
+    </style>
+    <script>
+        async function checkLogin() {
+            const login = document.getElementById("idLogin").value;
+            const password = document.getElementById("idPassword").value;
+            const response = await fetch("/rest/login", {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ login, password })
+            });
+            if (response.status !== 200) {
+                alert(response.statusText);
+                return;
+            }
+            const result = await response.json();
+            if (result.success) {
+                window.location.replace("/app/game.html");
+            } else {
+                document.getElementById("errorText").innerText = result.error;
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="errorText"></div>
+    <label for="idLogin">Логин:</label><input id="idLogin">
+    <label for="idPassword">Пароль:</label><input id="idPassword" type="password">
+    <button onclick="checkLogin()">Вход</button>
+</body>
+</html>

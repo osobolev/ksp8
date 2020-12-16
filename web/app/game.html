@@ -1,0 +1,95 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Игра</title>
+
+    <style>
+        #loading {
+            position: absolute;
+            left: 50%;
+            margin-left: -4em;
+            font-size: 200%;
+            animation: blink-animation 1s steps(5, start) infinite;
+        }
+
+        @keyframes blink-animation {
+            0% {
+                color: rgba(255, 0, 0, 1)
+            }
+            50% {
+                color: rgba(255, 0, 0, 0.1)
+            }
+            100% {
+                color: rgba(255, 0, 0, 1)
+            }
+        }
+    </style>
+
+    <script>
+        async function userClick() {
+            const loading = document.getElementById("loading");
+            loading.style.display = "block";
+            try {
+                const response = await fetch("/rest/app/click", {method: "POST"});
+                if (response.status !== 200) {
+                    alert(response.statusText);
+                    return;
+                }
+            } finally {
+                loading.style.display = "none";
+            }
+            showState();
+        }
+
+        async function logout() {
+            const response = await fetch("/rest/logout", {method: "POST"});
+            if (response.status !== 200) {
+                alert(response.statusText);
+                return;
+            }
+            window.location.replace("/login.html");
+        }
+
+        async function showState() {
+            const response = await fetch("/rest/app/gameState");
+            if (response.status !== 200) {
+                alert(response.statusText);
+                return;
+            }
+            const state = await response.json();
+            document.getElementById("clickCount").innerText = state.clicks;
+            const greeting = document.getElementById("greeting");
+            const winners = document.getElementById("winners");
+            winners.innerHTML = "";
+            if (state.winner) {
+                greeting.innerText = `Поздравляем, ${state.currentUser}, вы победитель!`;
+            } else {
+                greeting.innerText = `Здравствуйте, ${state.currentUser}!`;
+                const currentRecord = document.createElement("p");
+                currentRecord.innerText = `Текущий рекорд: ${state.maxClicks}`;
+                winners.appendChild(currentRecord);
+                for (const winnerName of state.winners) {
+                    const winner = document.createElement("p");
+                    winner.innerText = `Игрок: ${winnerName}`;
+                    winners.appendChild(winner);
+                }
+            }
+        }
+    </script>
+</head>
+<body onload="showState()">
+
+<div id="greeting"></div>
+
+Ваш счет: <span id="clickCount"></span>
+<button onclick="userClick()">+1</button>
+
+<div id="winners"></div>
+
+<p>
+    <button onclick="logout()">Выход</button>
+
+<div id="loading" style="display: none;">LOADING...</div>
+
+</body>
+</html>
