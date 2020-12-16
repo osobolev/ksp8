@@ -9,7 +9,8 @@
         }
     </style>
     <script>
-        async function checkLogin() {
+        async function checkLogin(e) {
+            e.preventDefault();
             const login = document.getElementById("idLogin").value;
             const password = document.getElementById("idPassword").value;
             const response = await fetch("/rest/login", {
@@ -35,8 +36,10 @@
 </head>
 <body>
     <div id="errorText"></div>
-    <label for="idLogin">Логин:</label><input id="idLogin">
-    <label for="idPassword">Пароль:</label><input id="idPassword" type="password">
-    <button onclick="checkLogin()">Вход</button>
+    <form>
+        <label for="idLogin">Логин:</label><input id="idLogin">
+        <label for="idPassword">Пароль:</label><input id="idPassword" type="password">
+        <button onclick="checkLogin(event)">Вход</button>
+    </form>
 </body>
 </html>
